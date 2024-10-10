@@ -8,16 +8,22 @@ import { Alert } from "@/components/ui/alert";
 import { Howl } from "howler";
 import urna from "./assets/urna.mp3";
 import teclas from "./assets/teclas.mp3";
+////////////////////////////////////////////////////////////////////////////by: Levy Sousa
 type Candidato = {
+  // type dos  dados que serão enviados
+
   nome: string;
   foto: string;
 };
 
 type Candidatos = {
+  //define o objt
+
   [key: string]: Candidato;
 };
 
 const candidatos: Candidatos = {
+  //   define todos os candidatos com nome, foto e o número dele
   "11": {
     nome: "Java",
     foto: "https://ensinado.com.br/wp-content/uploads/2021/06/java_logo_640.jpg",
@@ -57,11 +63,13 @@ const candidatos: Candidatos = {
 };
 
 const votoSchema = z.object({
+  //validaçao do formulário com o  zod
   digitos: z.string().min(2).regex(/^\d+$/, "Digite 2 números, por favor."),
 });
 
 const Urna: React.FC = () => {
   const {
+    // isso aqui é os ngc pra lidar com formulário usando o schema do zod
     handleSubmit,
     setValue,
     clearErrors,
@@ -70,11 +78,12 @@ const Urna: React.FC = () => {
     resolver: zodResolver(votoSchema),
   });
 
-  const [digitos, setDigitos] = useState<string[]>([]);
-  const [candidato, setCandidato] = useState<Candidato | null>(null);
-  const [votoConfirmado, setVotoConfirmado] = useState(false);
+  const [digitos, setDigitos] = useState<string[]>([]); // amazena os digito
+  const [candidato, setCandidato] = useState<Candidato | null>(null); //armazena o candidato escolhido
+  const [votoConfirmado, setVotoConfirmado] = useState(false); // controla o ngc se foi confirmado ou não
 
   useEffect(() => {
+    //verifica se foi escolhido os dois digitos
     if (digitos.length === 2) {
       const numero = digitos.join("") as keyof Candidatos;
       setCandidato(candidatos[numero] || null);
@@ -82,6 +91,7 @@ const Urna: React.FC = () => {
   }, [digitos]);
 
   const adicionarDigito = (digito: string) => {
+    //adiciona o digito a urna, mas só com os 2 números lá
     if (digitos.length < 2) {
       const novosDigitos = [...digitos, digito];
       setDigitos(novosDigitos);
@@ -91,12 +101,14 @@ const Urna: React.FC = () => {
   };
 
   const corrigir = () => {
+    // limpa tudo
     setDigitos([]);
     setCandidato(null);
     setValue("digitos", "");
   };
 
   const confirmar = () => {
+    //confirma o voto
     if (candidato) {
       localStorage.setItem("voto", JSON.stringify(candidato));
       alert(`Voto confirmado para ${candidato.nome}`);
@@ -108,95 +120,98 @@ const Urna: React.FC = () => {
   };
 
   const audio = new Howl({
+    //para tocar o áudio quando apertar o botão de confirmar
     src: [urna],
   });
   const digitando = new Howl({
+    // para tocar quando clicar nos número de 1 a 0
     src: [teclas],
   });
 
   return (
-    <div className="flex justify-center items-center h-screen bg-dsolucoes-500">
-      <div className="flex space-x-4">
-        <div className="bg-dsolucoes-300 p-4 rounded-lg w-96 h-96 flex flex-col">
-          <h2 className="text-center font-bold">Linguagem de Programação</h2>
-          <div className="border-2 border-black h-16 flex justify-center items-center mb-16 bg-dsolucoes-950">
-            {digitos.map((d, i) => (
+    <div className="flex flex-col md:flex-row justify-center items-center h-screen bg-dsolucoes-500 p-4">
+      <div className="bg-dsolucoes-300 p-4 rounded-lg w-full max-w-md h-96 flex flex-col mb-4 md:mb-0 md:mr-4">
+        <h2 className="text-center font-bold">Linguagem de Programação</h2>
+        <div className="border-2 border-black h-16 flex justify-center items-center mb-16 bg-dsolucoes-950">
+          {digitos.map(
+            (
+              d,
+              i // vai iterar o array e renderizar o span
+            ) => (
               <span key={i} className="text-2xl mx-1">
                 {d}
               </span>
-            ))}
-          </div>
-          {votoConfirmado ? (
-            <p className="text-center text-black font-bold text-9xl">FIM</p>
-          ) : candidato ? (
-            <div className="text-center ">
-              <img
-                src={candidato.foto}
-                alt={candidato.nome}
-                className="w-16 h-16 mx-auto rounded-md object-cover"
-              />
-              <p>{candidato.nome}</p>
-            </div>
-          ) : (
-            digitos.length === 2 && (
-              <p className="text-center text-red-500">Voto nulo</p>
             )
           )}
         </div>
-
-        <form
-          onSubmit={handleSubmit(confirmar)}
-          className="bg-dsolucoes-950 p-4 rounded-lg w-96 h-96 flex flex-col"
-        >
-          <h1 className="text-center text-2xl mb-4 font-bold text-white">
-            Dsolucoes
-          </h1>
-          <div className="grid grid-cols-3 gap-1">
-            {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map(
-              (numero) => (
-                <Button
-                  key={numero}
-                  onClick={() => {
-                    adicionarDigito(numero);
-                    digitando.play();
-                  }}
-                  className="p-4 bg-dsolucoes-400 text-white rounded text-lg"
-                  type="button"
-                >
-                  {numero}
-                </Button>
-              )
-            )}
-          </div>
-          {errors.digitos && (
-            <Alert className="mt-2">{String(errors.digitos.message)}</Alert>
-          )}
-          <div className="flex mt-4 gap-2 justify-center">
-            <Button
-              className="bg-dsolucoes-50 border px-4 py-2 text-zinc-500"
-              type="button"
-              onClick={() => alert("Voto em Branco")}
-            >
-              Branco
-            </Button>
-            <Button
-              className="bg-dsolucoes-400 text-white px-4 py-2"
-              type="button"
-              onClick={corrigir}
-            >
-              Corrige
-            </Button>
-            <Button
-              className="bg-dsolucoes-600 text-white px-4 py-2"
-              type="submit"
-              onClick={() => audio.play()}
-            >
-              Confirma
-            </Button>
-          </div>
-        </form>
+        {votoConfirmado ? (
+          <p className="text-center text-black font-bold text-9xl">FIM</p>
+        ) : candidato ? ( //quando acabar de votar aparecer essa mensagem de fim, assim como na urna de eleição
+          <div className="text-center">
+            <img
+              src={candidato.foto}
+              alt={candidato.nome}
+              className="w-16 h-16 mx-auto rounded-md object-cover"
+            />
+            <p>{candidato.nome}</p>
+          </div> //vai mostrar a foto do candidato e o nome dele
+        ) : (
+          digitos.length === 2 && (
+            <p className="text-center text-red-500">Voto nulo</p>
+          )
+        )}
       </div>
-    </div>
+
+      <form //vai ocorrer toda aquela validação do começo do código neste lugarzinho
+        onSubmit={handleSubmit(confirmar)}
+        className="bg-dsolucoes-950 p-4 rounded-lg w-full max-w-md h-96 flex flex-col"
+      >
+        <h1 className="text-center text-2xl mb-4 font-bold text-white">
+          Dsolucoes
+        </h1>
+        <div className="grid grid-cols-3 gap-1">
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map((numero) => (
+            <Button
+              key={numero}
+              onClick={() => {
+                adicionarDigito(numero);
+                digitando.play();
+              }}
+              className="p-4 bg-dsolucoes-400 text-white rounded text-lg"
+              type="button"
+            >
+              {numero}
+            </Button> //ao clicar esses bico aqui  vai adicionar o número no campo de digitação
+          ))}
+        </div>
+        {errors.digitos && (
+          <Alert className="mt-2">{String(errors.digitos.message)}</Alert>
+        )}
+        <div className="flex mt-4 gap-2 justify-center">
+          <Button
+            className="bg-dsolucoes-50 border px-4 py-2 "
+            type="button"
+            onClick={() => alert("Voto em Branco")}
+          >
+            Branco
+          </Button>
+          <Button
+            className="bg-dsolucoes-400 text-white px-4 py-2"
+            type="button"
+            onClick={corrigir}
+          >
+            Corrige
+          </Button>
+          <Button
+            className="bg-dsolucoes-600 text-white px-4 py-2"
+            type="submit"
+            onClick={() => audio.play()}
+          >
+            Confirma
+          </Button>
+        </div>
+      </form>
+    </div> //fim e o form vai ter o botao e a validação pra confirmar, corrigir e branco
   );
 };
 
