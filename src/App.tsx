@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./index.css";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,7 +72,7 @@ const Urna: React.FC = () => {
 
   const [digitos, setDigitos] = useState<string[]>([]);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
-  const [votoConfirmado, setVotoConfirmado] = useState(false); 
+  const [votoConfirmado, setVotoConfirmado] = useState(false);
 
   useEffect(() => {
     if (digitos.length === 2) {
@@ -99,7 +100,7 @@ const Urna: React.FC = () => {
     if (candidato) {
       localStorage.setItem("voto", JSON.stringify(candidato));
       alert(`Voto confirmado para ${candidato.nome}`);
-      setVotoConfirmado(true); 
+      setVotoConfirmado(true);
       corrigir();
       return;
     }
@@ -125,22 +126,20 @@ const Urna: React.FC = () => {
               </span>
             ))}
           </div>
-          {votoConfirmado ? ( 
+          {votoConfirmado ? (
             <p className="text-center text-black font-bold text-9xl">FIM</p>
+          ) : candidato ? (
+            <div className="text-center ">
+              <img
+                src={candidato.foto}
+                alt={candidato.nome}
+                className="w-16 h-16 mx-auto rounded-md object-cover"
+              />
+              <p>{candidato.nome}</p>
+            </div>
           ) : (
-            candidato ? (
-              <div className="text-center ">
-                <img
-                  src={candidato.foto}
-                  alt={candidato.nome}
-                  className="w-16 h-16 mx-auto rounded-md object-cover"
-                />
-                <p>{candidato.nome}</p>
-              </div>
-            ) : (
-              digitos.length === 2 && (
-                <p className="text-center text-red-500">Voto nulo</p>
-              )
+            digitos.length === 2 && (
+              <p className="text-center text-red-500">Voto nulo</p>
             )
           )}
         </div>
