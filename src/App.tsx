@@ -175,7 +175,7 @@ const Urna: React.FC = () => {
               key={numero}
               onClick={() => {
                 adicionarDigito(numero);
-                digitando.play();
+                digitando.play(); //ao clicar vai tocar o audio de teclas
               }}
               className="p-4 bg-dsolucoes-400 text-white rounded text-lg"
               type="button"
@@ -205,7 +205,7 @@ const Urna: React.FC = () => {
           <Button
             className="bg-dsolucoes-600 text-white px-4 py-2"
             type="submit"
-            onClick={() => audio.play()}
+            onClick={() => audio.play()} //vai tocar a música quando apertar o botão de confirmar
           >
             Confirma
           </Button>
