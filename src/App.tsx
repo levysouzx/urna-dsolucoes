@@ -108,16 +108,16 @@ const Urna: React.FC = () => {
   };
 
   const confirmar = () => {
-    //confirma o voto
-    if (candidato) {
-      localStorage.setItem("voto", JSON.stringify(candidato));
-      alert(`Voto confirmado para ${candidato.nome}`);
-      setVotoConfirmado(true);
-      corrigir();
-      return;
-    }
-    alert("Voto nulo");
+    candidato
+      ? (
+        localStorage.setItem("voto", JSON.stringify(candidato)),
+        alert(`Voto confirmado para ${candidato.nome}`),
+        setVotoConfirmado(true),
+        corrigir()
+      )
+      : alert("Voto nulo");
   };
+  
 
   const audio = new Howl({
     //para tocar o áudio quando apertar o botão de confirmar
@@ -157,7 +157,7 @@ const Urna: React.FC = () => {
           </div> //vai mostrar a foto do candidato e o nome dele
         ) : (
           digitos.length === 2 && (
-            <p className="text-center text-red-500">Voto nulo</p>
+            <p className="text-center font-bold text-red-500">Voto nulo</p>
           )
         )}
       </div>
@@ -175,7 +175,7 @@ const Urna: React.FC = () => {
               key={numero}
               onClick={() => {
                 adicionarDigito(numero);
-                digitando.play(); //ao clicar vai tocar o audio de teclas
+                digitando.play(); //ao clicar vai tocar o audio com som de teclas
               }}
               className="p-4 bg-dsolucoes-400 text-white rounded text-lg"
               type="button"
@@ -189,9 +189,9 @@ const Urna: React.FC = () => {
         )}
         <div className="flex mt-4 gap-2 justify-center">
           <Button
-            className="bg-dsolucoes-50 border px-4 py-2 "
+            className="bg-dsolucoes-50 border px-4 py-2 text-gray-400"
             type="button"
-            onClick={() => alert("Voto em Branco")}
+            onClick={() => alert("Voto em Branco")} //
           >
             Branco
           </Button>
